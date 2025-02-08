@@ -31,7 +31,8 @@ ENV LDFLAGS=-s
 FROM base AS cpu
 # amd64 uses gcc which requires devtoolset-11 for AVX extensions while arm64 uses clang
 RUN if [ "$(uname -m)" = "x86_64" ]; then yum install -y devtoolset-11-gcc devtoolset-11-gcc-c++; fi
-ENV PATH=/opt/rh/devtoolset-11/root/usr/bin:$PATH
+ENV PATH=/opt/rh/devtoolset-11/root/usr/bin:$PATH \
+    OLLAMA_CUSTOM_CPU_DEFS="-DLLAMA_AVX=on -DLLAMA_AVX2=on -DLLAMA_AVX512=on -DLLAMA_FMA=on -DLLAMA_AVX512_VBMI=on -DLLAMA_AVX512_VNNI=on -DLLAMA_AMX=on"
 RUN --mount=type=cache,target=/root/.ccache \
     cmake --preset 'CPU' \
         && cmake --build --parallel --preset 'CPU' \
